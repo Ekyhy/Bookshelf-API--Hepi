@@ -113,8 +113,8 @@ const getAllBooksHandler = (request, h) => {
 
 };
 const getBookByIdHandler = (request, h) => {
-    const { id } = request.params;
-    let book = books.find((book) => book.id === id)[0];
+    const {bookId} = request.params;
+    let book = books.find((book) => book.id === bookId);
     if (book) {
         const response = h.response({
             status: 'success',
@@ -135,5 +135,89 @@ const getBookByIdHandler = (request, h) => {
 //membuat kondisi jika variable book sudah memiliki nilai maka berhasil, dan jika variable book kosong akan bernilai gagal/fail
 };
 //membuat API untuk mendapatkan book sesuai dengan ID yang telah diterima book
+const editBookByIdHandler =  (request, h) =>{
+  const {bookId} = request.params;
+  const {
+      name,
+      year,
+      author,
+      summary,
+      publisher,
+      pageCount,
+      readPage,
+      reading,
+  } = request.payload;
 
-module.exports = { addBooksHandler, getAllBooksHandler, getBookByIdHandler, };
+  const updatedAt = new Date().toISOString();
+  if (name === undefined) {
+      const response = h.response({
+          status: 'fail',
+          message: 'Gagal memperbarui buku. Mohon isi nama buku',
+      });
+      response.code(400);
+      return response;
+  } else if (readPage > pageCount) {
+      const response = h.response({
+          status: 'fail',
+          message: 'Gagal memperbarui buku. readPage tidak boleh lebih besar dari pageCount',
+      });
+      response.code(400);
+      return response;
+  }
+  //129-143 pengkondisian jika ID tidak memiliki nama book atau readPage nilainya lebih besar dari pageCount maka dianggap gagal/fail
+
+  const index = books.findIndex((book) => book.id === bookId);
+  if (index !== -1) {
+      books[index] = {
+          ...books[index],
+          name,
+          year,
+          author,
+          summary,
+          publisher,
+          pageCount,
+          readPage,
+          reading,
+          updatedAt,
+      };
+      const response = h.response({
+          status:'success',
+          message:'Buku berhasil diperbarui',
+      });
+      response.code(200);
+      return response;
+  } else {
+      const response = h.response({
+          status:'fail',
+          message:'Gagal memperbarui buku. Id tidak ditemukan',
+      });
+      response.code(404);
+      return response;
+  }
+  //147-173 membuat kondisi jika ID ditemukan maka edit berhasil, jika ID tidak berhasil ditemukan maka gagal
+};
+
+const deleteBookByIdHandler = (request, h) => {
+  const { bookId } = request.params;
+  const index = books.findIndex((book) => book.id === bookId);
+
+  if (index !== -1) {
+      books.splice(index,1);
+      const response = h.response({
+          status: 'success',
+          message: 'Buku berhasil dihapus'
+      });
+      response.code(200);
+      return response;
+  } else {
+      const response = h.response({
+          status:'fail',
+          message:'Buku gagal dihapus. Id tidak ditemukan',
+      });
+      response.code(404);
+      return response;
+  }
+  //182-197 membuat kondisi statement jika ID ditemukan makan bisa terhapus, dan jika ID tidak ditemukan maka gagal
+};
+
+module.exports = { addBooksHandler, getAllBooksHandler, getBookByIdHandler, editBookByIdHandler, deleteBookByIdHandler };
