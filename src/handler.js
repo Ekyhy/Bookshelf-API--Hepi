@@ -16,8 +16,8 @@ const addBooksHandler = (request, h) => {
   
     const id = nanoid(16);
     const finished = readPage === pageCount;
-    const insertAt = new Date().toISOString();
-    const updatedAt = insertAt;
+    const insertedAt = new Date().toISOString();
+    const updatedAt = insertedAt;
 
     // Periksa apakah nama buku ada atau tidak
     if (!name) {
@@ -52,7 +52,7 @@ const addBooksHandler = (request, h) => {
       readPage,
       finished,
       reading,
-      insertAt,
+      insertedAt,
       updatedAt,
     };
   
